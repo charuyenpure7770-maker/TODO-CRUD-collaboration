@@ -45,7 +45,7 @@ function showOnUi(){
     return res.json();
   })
   .then((data)=>{
-    cl(data);
+    // cl(data);
     for(const key in data){
       data[key].id = key;
       state.todoArr.push(data[key]);
@@ -68,11 +68,11 @@ function templeting(arr){
       let result = ``;
 arr.forEach(ele => {
     result += `
-              <li class="list-group-item">
+              <li class="list-group-item mb-2">
                 <strong>${ele.title}</strong>
                         <P>${ele.description}</P>
-                    <div>
-                        <br>
+                    <div class="d-flex justify-content-between">
+                       
                         <button class="btn btn-warning btn-sm ">Edit</button>
                         <button class="btn btn-success btn-sm ">Delete</button>
                     </div>
@@ -81,3 +81,45 @@ arr.forEach(ele => {
 });
 list.innerHTML = result;
 }
+
+function onAddNewTodo(eve){
+  eve.preventDefault();
+
+  let newTodo = {
+    title : title.value,
+    description : description.value
+  }
+  // cl(newTodo)
+  fetch(TODO_URL, {
+    method: "POST",
+    body : JSON.stringify(newTodo),
+    headers : {
+      "content-type" : "application/json",
+      "auth" : "JWT TOKEN...."
+    }
+  })
+  .then(res => {
+    if(!res.ok){
+      throw new Error(`Error....`)
+    }
+    return res.json()
+  })
+  .then(data => {
+    newTodo.id = data.name;
+    state.todoArr.push(newTodo)
+    let li = document.createElement('li')
+    li.className =`list-group-item mb-2`
+    li.id = newTodo.id;
+    li.innerHTML = ` <strong>${newTodo.title}</strong>
+                        <P>${newTodo.description}</P>
+                    <div class="d-flex justify-content-between">
+                      
+                        <button class="btn btn-warning btn-sm ">Edit</button>
+                        <button class="btn btn-success btn-sm ">Delete</button>
+                    </div>`
+                list.append(li)
+                form.reset()
+  })
+}
+
+form.addEventListener('submit', onAddNewTodo)
